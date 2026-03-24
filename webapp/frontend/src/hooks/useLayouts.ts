@@ -38,7 +38,7 @@ export function useLayouts() {
     } catch {
       return;
     }
-  }, [layouts.length, refresh]);
+  }, [layouts, refresh]);
 
   return { layouts, isLoading, refresh, createLayout };
 }

@@ -40,12 +40,12 @@ class Palette(BaseModel):
 
 
 class TitleStyle(BaseModel):
-    align: str = Field("center", regex="^(left|center|right)$")
+    align: str = Field("center", pattern="^(left|center|right)$")
     color: str | None = None
 
 
 class SubtitleStyle(BaseModel):
-    align: str = Field("center", regex="^(left|center|right)$")
+    align: str = Field("center", pattern="^(left|center|right)$")
     color: str | None = None
 
 
@@ -88,7 +88,7 @@ class HeaderFooterConfig(BaseModel):
     padding: float = Field(6, ge=0)
     text: str | None = None
     logo: str | None = None
-    align: str = Field("center", regex="^(left|center|right)$")
+    align: str = Field("center", pattern="^(left|center|right)$")
     color: str | None = None
 
     @validator("logo")
@@ -109,7 +109,7 @@ class BarsConfig(BaseModel):
 class BackgroundConfig(BaseModel):
     color: str | None = "#ffffff"
     image: str | None = None
-    mode: str = Field("cover", regex="^(cover|contain|tile)$")
+    mode: str = Field("cover", pattern="^(cover|contain|tile)$")
 
     @validator("image")
     def _validate_image(cls, v: Optional[str]) -> Optional[str]:  # noqa: N805
