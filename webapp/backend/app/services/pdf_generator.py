@@ -159,7 +159,9 @@ class PDFGenerator:
 
         title_align = self._alignment(title_cfg.get("align", "center"))
         subtitle_align = self._alignment(subtitle_cfg.get("align", "center"))
-        title_color = colors.HexColor(title_cfg.get("color", colors_cfg.get("heading", "#111111")))
+        title_color = colors.HexColor(
+            title_cfg.get("color", colors_cfg.get("heading", "#111111"))
+        )
         subtitle_color = colors.HexColor(subtitle_cfg.get("color", "#4b5563"))
 
         heading_style = ParagraphStyle(
@@ -282,13 +284,14 @@ class PDFGenerator:
 
             elif b_type == "hr":
                 hr_thickness = float(hr_cfg.get("thickness", 1))
-                hr_color = colors.HexColor(hr_cfg.get("color", colors_cfg.get("border", "#9ca3af")))
+                hr_color = colors.HexColor(
+                    hr_cfg.get("color", colors_cfg.get("border", "#9ca3af"))
+                )
                 story.append(
                     HRFlowable(
                         color=hr_color,
                         thickness=hr_thickness,
-                        leftIndent=0,
-                        rightIndent=0,
+                        width="100%",
                     )
                 )
                 story.append(Spacer(1, 8))
@@ -328,7 +331,9 @@ class PDFGenerator:
 
         bg_image = background.get("image")
         if bg_image:
-            self._draw_background_image(canvas, width, height, bg_image, str(background.get("mode", "cover")))
+            self._draw_background_image(
+                canvas, width, height, bg_image, str(background.get("mode", "cover"))
+            )
 
         top = bars.get("top") or {}
         bottom = bars.get("bottom") or {}
@@ -354,7 +359,16 @@ class PDFGenerator:
             footer_pad=footer_pad,
         )
 
-    def _draw_header_footer(self, canvas, doc, *, header: dict, footer: dict, header_pad: float, footer_pad: float) -> None:
+    def _draw_header_footer(
+        self,
+        canvas,
+        doc,
+        *,
+        header: dict,
+        footer: dict,
+        header_pad: float,
+        footer_pad: float,
+    ) -> None:
         width, height = doc.pagesize
         left_x = doc.leftMargin
         right_x = width - doc.rightMargin
@@ -415,7 +429,15 @@ class PDFGenerator:
                     img_h = min(24 * mm, 0.8 * h)
                     x = self._resolve_aligned_x(align, left_x, center_x, right_x, img_w)
                     y = base_y - h + pad if top_anchor else base_y + pad
-                    canvas.drawImage(img, x, y, width=img_w, height=img_h, preserveAspectRatio=True, mask="auto")
+                    canvas.drawImage(
+                        img,
+                        x,
+                        y,
+                        width=img_w,
+                        height=img_h,
+                        preserveAspectRatio=True,
+                        mask="auto",
+                    )
             except Exception:  # noqa: BLE001
                 pass
 
@@ -431,14 +453,18 @@ class PDFGenerator:
                 canvas.drawCentredString(center_x, text_y, text)
             canvas.restoreState()
 
-    def _resolve_aligned_x(self, align: str, left_x: float, center_x: float, right_x: float, width: float) -> float:
+    def _resolve_aligned_x(
+        self, align: str, left_x: float, center_x: float, right_x: float, width: float
+    ) -> float:
         if align == "left":
             return left_x
         if align == "right":
             return right_x - width
         return center_x - (width / 2.0)
 
-    def _draw_background_image(self, canvas, page_w: float, page_h: float, rel_path: str, mode: str) -> None:
+    def _draw_background_image(
+        self, canvas, page_w: float, page_h: float, rel_path: str, mode: str
+    ) -> None:
         try:
             normalized = rel_path.lstrip("/")
             if normalized.startswith("assets/"):
@@ -458,7 +484,15 @@ class PDFGenerator:
                 while y < page_h:
                     x = 0.0
                     while x < page_w:
-                        canvas.drawImage(img, x, y, width=tile_w, height=tile_h, preserveAspectRatio=True, mask="auto")
+                        canvas.drawImage(
+                            img,
+                            x,
+                            y,
+                            width=tile_w,
+                            height=tile_h,
+                            preserveAspectRatio=True,
+                            mask="auto",
+                        )
                         x += tile_w
                     y += tile_h
                 return
@@ -481,6 +515,8 @@ class PDFGenerator:
                     h = page_w / img_ratio
             x = (page_w - w) / 2.0
             y = (page_h - h) / 2.0
-            canvas.drawImage(img, x, y, width=w, height=h, preserveAspectRatio=True, mask="auto")
+            canvas.drawImage(
+                img, x, y, width=w, height=h, preserveAspectRatio=True, mask="auto"
+            )
         except Exception:  # noqa: BLE001
             return

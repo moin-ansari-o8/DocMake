@@ -1,0 +1,102 @@
+{
+  "id": "34c23c75",
+  "name": "Custom 6",
+  "description": "Balanced monochrome layout",
+  "version": 1,
+  "base": "default",
+  "config": {
+    "margins": {
+      "left": 12.0,
+      "right": 12.0,
+      "top": 16.0,
+      "bottom": 16.0
+    },
+    "fonts": {
+      "body": {
+        "name": "Helvetica",
+        "size": 10.5
+      },
+      "heading": {
+        "name": "Helvetica-Bold",
+        "size": 13.0
+      },
+      "code": {
+        "name": "Courier",
+        "size": 9.5
+      }
+    },
+    "colors": {
+      "body": "#222222",
+      "heading": "#111111",
+      "border": "#9ca3af"
+    },
+    "palette": {
+      "primary": null,
+      "muted": null,
+      "surface": null
+    },
+    "title": {
+      "align": "center",
+      "color": null
+    },
+    "subtitle": {
+      "align": "center",
+      "color": null
+    },
+    "body": {
+      "paragraph": {
+        "space_after": 6
+      },
+      "list": {
+        "indent": 8,
+        "item_spacing": 2,
+        "bullet": "disc"
+      },
+      "code": {
+        "padding": 6,
+        "bg": "#f3f4f6",
+        "border": "#e5e7eb"
+      },
+      "hr": {
+        "thickness": 1,
+        "color": "#9ca3af"
+      },
+      "layout": {
+        "columns": 1,
+        "gutter": 12
+      }
+    },
+    "header": {
+      "height": 0,
+      "padding": 6,
+      "text": null,
+      "logo": null,
+      "align": "center",
+      "color": null
+    },
+    "footer": {
+      "height": 0,
+      "padding": 6,
+      "text": null,
+      "logo": null,
+      "align": "center",
+      "color": null
+    },
+    "bars": {
+      "top": {
+        "height": 0,
+        "color": "#111111"
+      },
+      "bottom": {
+        "height": 0,
+        "color": "#9ca3af"
+      }
+    },
+    "background": {
+      "color": "#ffffff",
+      "image": null,
+      "mode": "cover"
+    }
+  },
+  "immutable": false
+}
