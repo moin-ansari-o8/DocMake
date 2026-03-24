@@ -1,7 +1,7 @@
 from html import escape
 import re
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 from markdown_it import MarkdownIt
 
@@ -182,9 +182,32 @@ class MarkdownParser:
         }
 
     def _safe_href(self, href: str) -> str | None:
-        parsed = urlparse((href or "").strip())
-        if parsed.scheme in {"http", "https", "mailto", "tel"}:
-            return href
+        candidate = (href or "").strip()
+        parsed = urlparse(candidate)
+        if parsed.scheme not in {"http", "https", "mailto", "tel"}:
+            return None
+        if parsed.scheme in {"http", "https"} and not parsed.netloc:
+            return None
+        if parsed.scheme == "mailto" and not parsed.path:
+            return None
+        if parsed.scheme == "tel" and not parsed.path:
+            return None
+        if parsed.scheme in {"http", "https"}:
+            normalized = urlunparse(
+                (
+                    parsed.scheme,
+                    parsed.netloc,
+                    parsed.path,
+                    parsed.params,
+                    parsed.query,
+                    "",
+                )
+            )
+            return normalized
+        if parsed.scheme == "mailto":
+            return f"mailto:{parsed.path}"
+        if parsed.scheme == "tel":
+            return f"tel:{parsed.path}"
         return None
 
     def _normalize_whitespace(self, text: str) -> str:

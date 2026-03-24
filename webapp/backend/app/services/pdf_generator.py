@@ -22,6 +22,8 @@ from reportlab.platypus import (
 from app.config import settings
 from app.services.layout_manager import LayoutManager
 
+MIN_FRAME_DIMENSION = 20
+
 
 class PDFGenerator:
     def __init__(self, layout_id: str = "default"):
@@ -79,13 +81,17 @@ class PDFGenerator:
 
         frame_y = doc.bottomMargin + footer_h
         frame_h = max(
-            20,
+            MIN_FRAME_DIMENSION,
             doc.height - header_h - footer_h,
         )
         columns = int(body_layout.get("columns", 1) or 1)
         gutter = float(body_layout.get("gutter", 12)) * mm
         usable_w = doc.width
-        col_w = usable_w if columns == 1 else max((usable_w - gutter) / 2.0, 20)
+        col_w = (
+            usable_w
+            if columns == 1
+            else max((usable_w - gutter) / 2.0, MIN_FRAME_DIMENSION)
+        )
 
         frames = [
             Frame(
@@ -290,7 +296,10 @@ class PDFGenerator:
         try:
             doc.build(story)
         except Exception as exc:  # noqa: BLE001
-            raise RuntimeError(f"Failed to build PDF: {exc}") from exc
+            raise RuntimeError(
+                f"Failed to build PDF during doc_build "
+                f"(layout={self.layout.get('id', 'unknown')}, title={title!r}): {exc}"
+            ) from exc
         return output_path
 
     def _alignment(self, align: str) -> int:

@@ -28,6 +28,8 @@ async def upload_asset(
     normalized_kind = (kind or "").strip().lower()
     if normalized_kind not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="Invalid asset kind")
+    if ".." in (user_id or ""):
+        raise HTTPException(status_code=400, detail="Invalid user id")
 
     ext = Path(file.filename or "").suffix.lower()
     if ext not in ALLOWED_EXTENSIONS[normalized_kind]:
@@ -46,13 +48,23 @@ async def upload_asset(
     if content_type != "image/svg+xml":
         detected = detect_image_type(None, h=content)
         if detected not in {"png", "jpeg"}:
-            raise HTTPException(status_code=400, detail="Invalid image content")
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Invalid image content; detected={detected or 'unknown'}, "
+                    "allowed=png,jpeg"
+                ),
+            )
 
     safe_user = "".join(ch for ch in user_id if ch.isalnum() or ch in {"-", "_"})
     if not safe_user:
         raise HTTPException(status_code=400, detail="Invalid user id")
 
-    user_dir = settings.ASSETS_DIR / safe_user
+    user_dir = (settings.ASSETS_DIR / safe_user).resolve()
+    try:
+        user_dir.relative_to(settings.ASSETS_DIR.resolve())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Invalid user id path") from exc
     user_dir.mkdir(parents=True, exist_ok=True)
 
     filename = f"{normalized_kind}_{uuid4().hex[:10]}{ext}"

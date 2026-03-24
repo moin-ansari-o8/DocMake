@@ -101,9 +101,17 @@ class BarSpec(BaseModel):
     color: str = "#111111"
 
 
+def _top_bar_factory() -> BarSpec:
+    return BarSpec(color="#111111")
+
+
+def _bottom_bar_factory() -> BarSpec:
+    return BarSpec(color="#9ca3af")
+
+
 class BarsConfig(BaseModel):
-    top: BarSpec = Field(default_factory=BarSpec)
-    bottom: BarSpec = Field(default_factory=lambda: BarSpec(color="#9ca3af"))
+    top: BarSpec = Field(default_factory=_top_bar_factory)
+    bottom: BarSpec = Field(default_factory=_bottom_bar_factory)
 
 
 class BackgroundConfig(BaseModel):
