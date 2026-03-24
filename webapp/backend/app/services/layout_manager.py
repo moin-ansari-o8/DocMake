@@ -178,10 +178,16 @@ class LayoutManager:
         for rel_path in [header_logo, footer_logo, bg_image]:
             if not rel_path:
                 continue
-            resolved = (self.assets_dir / rel_path).resolve()
+            resolved = self._resolve_asset_path(rel_path)
             try:
                 resolved.relative_to(self.assets_dir.resolve())
             except ValueError as exc:
                 raise ValueError("Asset path escapes assets root") from exc
             if not resolved.exists():
                 raise ValueError(f"Asset not found: {rel_path}")
+
+    def _resolve_asset_path(self, rel_path: str) -> Path:
+        normalized = rel_path.strip().lstrip("/")
+        if normalized.startswith("assets/"):
+            normalized = normalized[len("assets/") :]
+        return (self.assets_dir / normalized).resolve()

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { layoutService } from "../services/api";
-import type { LayoutDetail, LayoutSummary } from "../types";
+import type { LayoutSummary } from "../types";
 
 const fallbackLayouts: LayoutSummary[] = [
   { id: "default", name: "Default", description: "Standard document layout" },
@@ -31,17 +31,9 @@ export function useLayouts() {
   }, [refresh]);
 
   const createLayout = useCallback(async () => {
-    const base: Omit<LayoutDetail, "id"> = {
-      name: `Custom ${layouts.length + 1}`,
-      description: "User-created layout",
-      config: {
-        margins: { left: 12, right: 12, top: 16, bottom: 16 },
-        colors: { body: "#1f2937", heading: "#111111", border: "#9ca3af" },
-      },
-    };
-
     try {
-      await layoutService.create(base);
+      const source = layouts.find((l) => l.id === "default")?.id ?? "default";
+      await layoutService.clone(source, `Custom ${layouts.length + 1}`);
       await refresh();
     } catch {
       return;

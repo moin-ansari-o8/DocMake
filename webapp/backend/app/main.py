@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.routers import ai, layouts, pdf
+from app.routers import ai, assets, layouts, pdf
 
 app = FastAPI(
     title="DocMake API",
@@ -22,8 +22,10 @@ app.add_middleware(
 app.include_router(pdf.router, prefix="/api/pdf", tags=["PDF"])
 app.include_router(ai.router, prefix="/api/ai", tags=["AI"])
 app.include_router(layouts.router, prefix="/api/layouts", tags=["Layouts"])
+app.include_router(assets.router, prefix="/api/assets", tags=["Assets"])
 
 app.mount("/pdf-output", StaticFiles(directory=str(settings.PDF_OUTPUT_DIR)), name="pdf-output")
+app.mount("/assets", StaticFiles(directory=str(settings.ASSETS_DIR)), name="assets")
 
 
 @app.get("/")

@@ -188,27 +188,11 @@ class MarkdownParser:
         return None
 
     def _normalize_whitespace(self, text: str) -> str:
-        return re.sub(r"\s+", " ", text).strip()
+        return re.sub(r"\s+", " ", text or "")
 
     def _has_visible_text(self, html: str) -> bool:
         plain = re.sub(r"<[^>]+>", "", html or "")
         return bool(plain.strip())
 
     def _strip_tags(self, html: str) -> str:
-        # minimal strip since we only generate simple tags
-        return (
-            html.replace("<b>", "")
-            .replace("</b>", "")
-            .replace("<i>", "")
-            .replace("</i>", "")
-            .replace("<sub>", "")
-            .replace("</sub>", "")
-            .replace("<sup>", "")
-            .replace("</sup>", "")
-            .replace("<strike>", "")
-            .replace("</strike>", "")
-            .replace("<code>", "")
-            .replace("</code>", "")
-            .replace('<a href="#">', "")
-            .replace("</a>", "")
-        )
+        return re.sub(r"<[^>]+>", "", html or "")
