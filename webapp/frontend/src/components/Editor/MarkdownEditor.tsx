@@ -7,7 +7,11 @@ interface MarkdownEditorProps {
   theme: Theme;
 }
 
-export function MarkdownEditor({ value, onChange, theme }: MarkdownEditorProps) {
+export function MarkdownEditor({
+  value,
+  onChange,
+  theme,
+}: MarkdownEditorProps) {
   return (
     <Editor
       height="100%"
@@ -23,6 +27,13 @@ export function MarkdownEditor({ value, onChange, theme }: MarkdownEditorProps) 
         scrollBeyondLastLine: false,
         automaticLayout: true,
         padding: { top: 12, bottom: 12 },
+        quickSuggestions: true,
+        quickSuggestionsDelay: 0,
+        suggestOnTriggerCharacters: true,
+        acceptSuggestionOnEnter: "smart",
+        tabCompletion: "on",
+        snippetSuggestions: "inline",
+        parameterHints: { enabled: false },
       }}
     />
   );

@@ -1,0 +1,18 @@
+{
+  "name": "Custom 4",
+  "description": "User-created layout",
+  "config": {
+    "margins": {
+      "left": 12,
+      "right": 12,
+      "top": 16,
+      "bottom": 16
+    },
+    "colors": {
+      "body": "#1f2937",
+      "heading": "#111111",
+      "border": "#9ca3af"
+    }
+  },
+  "id": "7abd0903"
+}
