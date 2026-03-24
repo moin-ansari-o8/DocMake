@@ -1,5 +1,7 @@
 from html import escape
+import re
 from typing import Any
+from urllib.parse import urlparse
 
 from markdown_it import MarkdownIt
 
@@ -23,9 +25,10 @@ class MarkdownParser:
 
     def _inline_to_html(self, tokens: InlineTokens) -> str:
         parts: list[str] = []
+        open_link_stack: list[bool] = []
         for tok in tokens:
             if tok.type == "text":
-                parts.append(escape(tok.content))
+                parts.append(escape(self._normalize_whitespace(tok.content)))
             elif tok.type in {"softbreak", "hardbreak"}:
                 parts.append("<br/>")
             elif tok.type in {"strong_open", "strong_close"}:
@@ -46,9 +49,15 @@ class MarkdownParser:
                     href = attrs.get("href", "#")
                 else:
                     href = next((attr[1] for attr in attrs if attr[0] == "href"), "#")
-                parts.append(f'<a href="{escape(href)}">')
+                safe_href = self._safe_href(href)
+                if safe_href:
+                    parts.append(f'<a href="{escape(safe_href)}">')
+                    open_link_stack.append(True)
+                else:
+                    open_link_stack.append(False)
             elif tok.type == "link_close":
-                parts.append("</a>")
+                if open_link_stack and open_link_stack.pop():
+                    parts.append("</a>")
         return "".join(parts)
 
     def parse(self, content: str) -> dict[str, Any]:
@@ -63,6 +72,8 @@ class MarkdownParser:
 
             if tok.type == "heading_open":
                 level = int(tok.tag[-1]) if tok.tag and tok.tag.startswith("h") else 1
+                if i + 1 >= len(tokens):
+                    break
                 inline = tokens[i + 1]
                 text = (
                     self._inline_to_html(inline.children or [])
@@ -80,20 +91,25 @@ class MarkdownParser:
                 # treat first blockquote as subtitle, others as paragraphs
                 inner = tokens[i + 1] if i + 1 < len(tokens) else None
                 if inner and inner.type == "paragraph_open":
-                    inline = tokens[i + 2]
+                    inline = tokens[i + 2] if i + 2 < len(tokens) else None
                     text = (
                         self._inline_to_html(inline.children or [])
-                        if inline.type == "inline"
+                        if inline and inline.type == "inline"
                         else ""
                     )
                     if subtitle is None:
                         subtitle = self._strip_tags(text)
                     else:
                         blocks.append({"type": "paragraph", "text": text})
-                i += 4  # blockquote_open, paragraph_open, inline, paragraph_close, blockquote_close
+                i += 1
+                while i < len(tokens) and tokens[i].type != "blockquote_close":
+                    i += 1
+                i += 1
                 continue
 
             if tok.type == "paragraph_open":
+                if i + 1 >= len(tokens):
+                    break
                 inline = tokens[i + 1]
                 html_text = (
                     self._inline_to_html(inline.children or [])
@@ -116,13 +132,15 @@ class MarkdownParser:
                         # expect paragraph or inline inside
                         j = i + 1
                         item_parts: list[str] = []
-                        while tokens[j].type != "list_item_close":
+                        while j < len(tokens) and tokens[j].type != "list_item_close":
                             if tokens[j].type == "inline":
                                 item_parts.append(
                                     self._inline_to_html(tokens[j].children or [])
                                 )
                             j += 1
-                        items.append("<br/>".join(item_parts))
+                        item_html = "<br/>".join(item_parts).strip()
+                        if self._has_visible_text(item_html):
+                            items.append(item_html)
                         i = j
                     i += 1
                 blocks.append(
@@ -132,6 +150,13 @@ class MarkdownParser:
                         "items": items,
                     }
                 )
+                i += 1
+                continue
+
+            if tok.type == "inline":
+                text = self._inline_to_html(tok.children or [])
+                if self._has_visible_text(text):
+                    blocks.append({"type": "paragraph", "text": text})
                 i += 1
                 continue
 
@@ -155,6 +180,19 @@ class MarkdownParser:
             "subtitle": subtitle or "",
             "blocks": blocks,
         }
+
+    def _safe_href(self, href: str) -> str | None:
+        parsed = urlparse((href or "").strip())
+        if parsed.scheme in {"http", "https", "mailto", "tel"}:
+            return href
+        return None
+
+    def _normalize_whitespace(self, text: str) -> str:
+        return re.sub(r"\s+", " ", text).strip()
+
+    def _has_visible_text(self, html: str) -> bool:
+        plain = re.sub(r"<[^>]+>", "", html or "")
+        return bool(plain.strip())
 
     def _strip_tags(self, html: str) -> str:
         # minimal strip since we only generate simple tags

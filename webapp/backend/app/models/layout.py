@@ -96,9 +96,14 @@ class HeaderFooterConfig(BaseModel):
         return _validate_asset_path(v)
 
 
+class BarSpec(BaseModel):
+    height: float = Field(0, ge=0)
+    color: str = "#111111"
+
+
 class BarsConfig(BaseModel):
-    top: dict | None = None
-    bottom: dict | None = None
+    top: BarSpec = Field(default_factory=BarSpec)
+    bottom: BarSpec = Field(default_factory=lambda: BarSpec(color="#9ca3af"))
 
 
 class BackgroundConfig(BaseModel):

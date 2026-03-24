@@ -12,6 +12,7 @@ from app.models.layout import Layout
 class LayoutManager:
     def __init__(self):
         self.layouts_dir = settings.LAYOUTS_DIR
+        self.assets_dir = settings.ASSETS_DIR
         self.default_ids = {"default", "academic", "religious"}
         self._ensure_defaults()
 
@@ -164,4 +165,23 @@ class LayoutManager:
             model = Layout(**payload)
         except ValidationError as exc:
             raise ValueError(exc.errors()) from exc
-        return model.dict()
+        data = model.dict()
+        self._validate_asset_references(data)
+        return data
+
+    def _validate_asset_references(self, layout: dict[str, Any]) -> None:
+        config = layout.get("config", {})
+        header_logo = (((config.get("header") or {}).get("logo")) or "").strip()
+        footer_logo = (((config.get("footer") or {}).get("logo")) or "").strip()
+        bg_image = (((config.get("background") or {}).get("image")) or "").strip()
+
+        for rel_path in [header_logo, footer_logo, bg_image]:
+            if not rel_path:
+                continue
+            resolved = (self.assets_dir / rel_path).resolve()
+            try:
+                resolved.relative_to(self.assets_dir.resolve())
+            except ValueError as exc:
+                raise ValueError("Asset path escapes assets root") from exc
+            if not resolved.exists():
+                raise ValueError(f"Asset not found: {rel_path}")
