@@ -22,12 +22,7 @@ export function PDFViewer({ pdfUrl, isGenerating, error, onGenerate }: PDFViewer
   const [scale, setScale] = useState(1.1);
 
   useEffect(() => {
-    if (!pdfUrl) {
-      setPdf(null);
-      setCurrentPage(1);
-      setTotalPages(0);
-      return;
-    }
+    if (!pdfUrl) return;
 
     let mounted = true;
     const load = async () => {
