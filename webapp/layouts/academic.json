@@ -1,0 +1,13 @@
+{
+  "id": "academic",
+  "name": "Academic",
+  "description": "Formal document layout",
+  "config": {
+    "margins": { "left": 18, "right": 18, "top": 20, "bottom": 20 },
+    "fonts": {
+      "body": { "name": "Times-Roman", "size": 11 },
+      "heading": { "name": "Times-Bold", "size": 14 }
+    },
+    "colors": { "body": "#1f2937", "heading": "#111111", "border": "#6b7280" }
+  }
+}

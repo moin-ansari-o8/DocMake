@@ -1,0 +1,13 @@
+{
+  "id": "default",
+  "name": "Default",
+  "description": "Balanced monochrome layout",
+  "config": {
+    "margins": { "left": 12, "right": 12, "top": 16, "bottom": 16 },
+    "fonts": {
+      "body": { "name": "Helvetica", "size": 10.5 },
+      "heading": { "name": "Helvetica-Bold", "size": 13 }
+    },
+    "colors": { "body": "#222222", "heading": "#111111", "border": "#9ca3af" }
+  }
+}

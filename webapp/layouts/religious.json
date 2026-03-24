@@ -1,0 +1,13 @@
+{
+  "id": "religious",
+  "name": "Religious",
+  "description": "Traditional and clean layout",
+  "config": {
+    "margins": { "left": 15, "right": 15, "top": 18, "bottom": 18 },
+    "fonts": {
+      "body": { "name": "Helvetica", "size": 11 },
+      "heading": { "name": "Helvetica-Bold", "size": 14 }
+    },
+    "colors": { "body": "#374151", "heading": "#111111", "border": "#9ca3af" }
+  }
+}
